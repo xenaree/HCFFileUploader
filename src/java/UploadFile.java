@@ -23,52 +23,63 @@ import org.apache.commons.io.FilenameUtils;
 
 public class UploadFile extends HttpServlet {
 
-    String SaveFile = "E:/upload/";
+//    String SaveFile = "D:/upload/";
+    String SaveFile = "";
+
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+
         response.setContentType("text/html;charset=UTF-8");
         PrintWriter out = response.getWriter();
+        String file = request.getParameter("filetoupload");
+        out.println(file);
+
         try {
-            boolean ismultipart =ServletFileUpload.isMultipartContent(request);
-            if(!ismultipart){
-                
-            }
-            else{
+            boolean ismultipart = ServletFileUpload.isMultipartContent(request);
+            if (!ismultipart) {
+
+            } else {
                 FileItemFactory factory = new DiskFileItemFactory();
                 ServletFileUpload upload = new ServletFileUpload(factory);
                 List items = null;
-                
-                try{
+
+                try {
                     items = upload.parseRequest(request);
-                    
-                }catch(Exception e){
-                    
+
+                } catch (Exception e) {
+                    out.println(e.toString());
+
                 }
                 Iterator itr = items.iterator();
-                while(itr.hasNext()){
+                while (itr.hasNext()) {
                     FileItem item = (FileItem) itr.next();
-                    
-                    if(item.isFormField()){
-                        
-                    }
-                    else{
+
+                    if (item.isFormField()) {
+                        if (item.getFieldName().equals("destination"));
+                        {
+                            SaveFile = item.getString();
+                            out.println(SaveFile);
+
+                        }
+
+                    } else {
                         String itemname = item.getName();
-                        if((itemname == null) || itemname.equals("")){
+                        if ((itemname == null) || itemname.equals("")) {
                             continue;
                         }
                         String filename = FilenameUtils.getName(itemname);
                         File f = checkExist(filename);
                         item.write(f);
-                        
+
                     }
                 }
-                
+
             }
-          
-        }catch(Exception e){
-            
-        }
-        finally{
+
+        } catch (Exception e) {
+            out.println(e.toString());
+
+        } finally {
             out.close();
         }
     }
@@ -82,12 +93,6 @@ public class UploadFile extends HttpServlet {
      * @throws ServletException if a servlet-specific error occurs
      * @throws IOException if an I/O error occurs
      */
-    @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        processRequest(request, response);
-    }
-
     /**
      * Handles the HTTP <code>POST</code> method.
      *
@@ -113,16 +118,15 @@ public class UploadFile extends HttpServlet {
     }// </editor-fold>
 
     private File checkExist(String filename) {
-        File f = new File(SaveFile+"/"+filename);
-        
-        if(f.exists()){
-            StringBuffer sb = new StringBuffer(filename);
-            sb.insert(sb.lastIndexOf("."),"-"+new Date().getTime());
-            f = new File(SaveFile+"/"+sb.toString());
-        }
-        return f;   
-        
-    } 
+        File f = new File(SaveFile + "/" + filename);
 
+        if (f.exists()) {
+            StringBuffer sb = new StringBuffer(filename);
+            sb.insert(sb.lastIndexOf("."), "-" + new Date().getTime());
+            f = new File(SaveFile + "/" + sb.toString());
+        }
+        return f;
+
+    }
 
 }
